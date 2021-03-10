@@ -1,0 +1,25 @@
+{
+    "name" : "Productivity Extension",
+    "description" : "Google Chrome extension that keeps track on user productivity",
+    "version" : "1.0.0",
+    "manifest_version" : 2,
+    "icons" : {
+        "16" : "./icons/sample_icon_16.png",
+        "32" : "./icons/sample_icon_32.png",
+        "48" : "./icons/sample_icon_48.png",
+        "128" : "./icons/sample_icon_128.png"
+    },
+    "background" : {
+        "scripts" : ["./background.js"]
+    },
+    "options_page" : "options.html",
+    "browser_action" :{
+        "default_pop" : "popup.html"
+    },
+    "permissions" : [
+        "tabs",
+        "activeTabs",
+        "storage",
+        "notifications"
+    ]
+}
