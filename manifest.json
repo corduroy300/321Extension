@@ -21,6 +21,7 @@
         "tabs",
         "activeTab",
         "storage",
-        "notifications"
+        "notifications",
+        "windows"
     ]
 }
