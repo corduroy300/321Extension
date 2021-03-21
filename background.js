@@ -6,6 +6,7 @@
     });
 });*/
 console.log("hello world");
+let urlMap = new Map();
 
 chrome.tabs.onActiveChanged.addListener(function (windowId) {
     if (windowId == chrome.windows.WINDOW_ID_NONE){
@@ -26,6 +27,7 @@ function tabTrack(isWindowActive){
         let title = tabs[0].title;
         let currentTab = tabs[0];
         let hostName = url;
+        urlMap.set(hostName, 1);
         try{
             let urlObject = new URL(url);
             hostName = urlObject.hostname;
@@ -33,6 +35,7 @@ function tabTrack(isWindowActive){
             console.log("Error in getting hostname from url");
         }
         console.log(hostName);
+        console.log("printing from hash map: " + hostName);
 
 
 
