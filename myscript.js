@@ -1,6 +1,10 @@
 
 document.getElementById("startStop").addEventListener("click", startStop);
 
+//When user hits enter on input text feild function addToStorage is called
+document.getElementById("hostname").addEventListener("change", addToStorage);
+
+
 let interval = null;
 let status = "stopped";
 function recordTime(){
@@ -28,4 +32,17 @@ function startStop(){
         document.getElementById("startStop").innerHTML = "Start";
         status = "stopped";
     }
+}
+
+//Add to storage adds the new hostname to chrome.storage
+//currently working somewhat, need to understand if 'siteName' is actually the hostnames like we want the keys to be
+
+function addToStorage(){
+    var siteName = document.getElementById("hostname").nodeValue;
+
+    chrome.storage.sync.set({siteName: 100});
+
+    chrome.storage.sync.get(siteName, function(data){
+        alert(data.siteName);
+    });
 }
