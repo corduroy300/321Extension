@@ -1,1 +1,1 @@
-# 306Extension
+# CS 321 Productivity Tracker Extension
