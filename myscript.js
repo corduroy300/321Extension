@@ -2,7 +2,13 @@
 document.getElementById("startStop").addEventListener("click", startStop);
 
 //When user hits enter on input text field function addToStorage is called
-// document.getElementById("hostname").addEventListener("change", addToStorage);
+/*document.getElementById("hostname").addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      addToStorage();
+    }
+});*/
+
+//var unproductiveTabsList = {};
 
 let interval = null;
 let status = "stopped";
@@ -22,6 +28,7 @@ function startStop() {
         interval = window.setInterval(recordTime, 1000);
         document.getElementById("startStop").innerHTML = "Stop";
         //chrome.action.setBadgeText({text: "10"}); // Sets badge (Only works in background.js so disabled until migration)
+        document.getElementById("webManagerButton").style.visibility =  "hidden";
         status = "started";
     }
 
@@ -29,19 +36,27 @@ function startStop() {
         window.clearInterval(interval);
         document.getElementById("startStop").innerHTML = "Start";
         //chrome.action.setBadgeText({text: "10"}); // Clears badge (Only works in background.js so disabled until migration)
+        document.getElementById("webManagerButton").style.visibility =  "visible";
         status = "stopped";
+    
     }
 }
 
 //Add to storage adds the new hostname to chrome.storage
 //currently working somewhat, need to understand if 'siteName' is actually the hostnames like we want the keys to be
 
-function addToStorage() {
-    var siteName = document.getElementById("hostname").nodeValue;
+/*function addToStorage() {
+    var siteName = document.getElementById("hostname").value;
 
-    chrome.storage.sync.set({ siteName: 100 });
+    var infoOfSite = {
+        url: siteName,
+        timeSpent: 0,
+        lastTimeVisited: 0,
+    };
 
-    chrome.storage.sync.get(siteName, function (data) {
-        alert(data.siteName);
-    });
-}
+    if(typeof unproductiveTabsList[siteName] === 'undefined'){
+        unproductiveTabsList[siteName] = infoOfSite;
+        alert("added");
+    }
+
+}*/

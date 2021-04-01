@@ -9,7 +9,10 @@ var initialize = false;
     });
 });*/
 //console.log("hello world");
-document.getElementById("hostname").addEventListener("change", addToStorage);
+
+
+
+
 
 
 chrome.tabs.onActiveChanged.addListener(function () {
@@ -85,7 +88,6 @@ function tabTrack() {
 }
 
 function initializeUnproductiveWebsites() {
-
     //currently sets the list of unproductive websites as youtube and netflix.
     //the tabTrack function will compare the users tabs against this list
     //needs further implementation to incorporate user data
@@ -101,6 +103,7 @@ function initializeUnproductiveWebsites() {
             lastTimeVisited: Date.now()
         }
     }
+
     const tabTimesObjectString = JSON.stringify(unproductiveTabsList);
     let newTabTimesObject = {};
     newTabTimesObject[unproductiveTabsKey] = tabTimesObjectString;
