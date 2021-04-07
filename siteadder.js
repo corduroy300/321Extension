@@ -1,4 +1,4 @@
-//const unproductiveTabsKey = "unproductiveTabs";
+const unproductiveTabsKey = "unproductiveTabs";
 var unproductiveTabs;
 
 //sets the unproductiveTabs object to the value saved in chrome storage
@@ -27,7 +27,7 @@ function addToStorage() {
     var infoOfSite = {
         "url": siteName,
         "timeSpent": 0,
-        "lastTimeVisited": 0,
+        "lastTimeVisited": Date.now(),
     };
 
     if(unproductiveTabs == null){
@@ -44,10 +44,10 @@ function addToStorage() {
     //After setting the new site name, we need to update this object in chrome storage so that the values are updated across all files
     const tabTimesObjectString = JSON.stringify(unproductiveTabs);
     let newTabTimesObject = {};
-    newTabTimesObject["unproductiveTabs"] = tabTimesObjectString;
+    newTabTimesObject[unproductiveTabsKey] = tabTimesObjectString;
     chrome.storage.sync.set(newTabTimesObject, function () {
-        chrome.storage.sync.get("unproductiveTabs", function (result) {
-            alert("current unproductiveTabsList is: " + result["unproductiveTabs"])});
+        chrome.storage.sync.get(unproductiveTabsKey, function (result) {
+            alert("current unproductiveTabsList is: " + result[unproductiveTabsKey])});
     });
 
 }
