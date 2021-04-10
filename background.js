@@ -1,8 +1,9 @@
 const unproductiveTabsKey = "unproductiveTabs";
 const lastActiveTabKey = "lastActiveTab";
-var isRecording = true;
+var isRecording = false;
 var initialize = false;
 
+//alert("refreshed");
 /*chrome.tabs.onActivated.addListener(tab =>{
     chrome.tabs.get(tab.tabId, tab_info =>{
         console.log(tab_info.url)
@@ -12,10 +13,7 @@ var initialize = false;
 
 
 
-
-
-
-chrome.tabs.onActiveChanged.addListener(function () {
+chrome.tabs.onActivated.addListener(function () {
     if (isRecording) {
         if (!initialize) {
             initializeUnproductiveWebsites();
@@ -25,17 +23,31 @@ chrome.tabs.onActiveChanged.addListener(function () {
     }
 });
 
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tabInfo){
+    if(changeInfo.url){
+        if (isRecording) {
+            if (!initialize) {
+                initializeUnproductiveWebsites();
+                initialize = true;
+            }
+            tabTrack();
+        }
+    }
+});
+
 function tabTrack() {
 
     //search for the current active tab
     chrome.tabs.query({ 'active': true }, function (tabs) {
 
         let url = tabs[0].url;
-        let title = tabs[0].title;
-        let currentTab = tabs[0];
         let hostName = url;
-        let urlObject = new URL(url);
-        hostName = urlObject.hostname;
+        try{
+            let urlObject = new URL(url);
+            hostName = urlObject.hostname;
+        } catch{
+            console.log("Cannot retrieve URL from tab");
+        }
 
         //retrieves the unproductiveTabsList and the lastActiveTab from chrome storage
         chrome.storage.sync.get([unproductiveTabsKey, lastActiveTabKey], function (result) {
@@ -61,7 +73,7 @@ function tabTrack() {
                 // if not, then ignore the unproductiveTabObject and update the lastActiveTab object in storage
                 if (unproductiveTabs.hasOwnProperty(lastActiveTabURL)) {
                     let lastActiveTabValue = unproductiveTabs[lastActiveTabURL];
-                    lastActiveTabValue["timeSpent"] = numOfPassedSeconds;
+                    lastActiveTabValue["timeSpent"] += numOfPassedSeconds;
                     lastActiveTabValue["lastTimeVisited"] = Date.now();
                 }
             }
@@ -87,6 +99,23 @@ function tabTrack() {
     });
 }
 
+function unpause(){
+    chrome.storage.sync.get(lastActiveTabKey, function (result){
+        let lastActiveTabString = result[lastActiveTabKey];
+        if(lastActiveTabString != null){
+            lastActiveTab = JSON.parse(lastActiveTabString);
+            lastActiveTab["lastTimeVisited"] = Date.now();
+
+            lastActiveTabString = JSON.stringify;
+            let newActiveTabObject = {};
+            newActiveTabObject[lastActiveTabKey] = lastActiveTabString;
+            chrome.storage.sync.set(newActiveTabObject, function(){
+
+            });
+        }
+    })
+}
+
 function initializeUnproductiveWebsites() {
     //currently sets the list of unproductive websites as youtube and netflix.
     //the tabTrack function will compare the users tabs against this list
@@ -110,6 +139,97 @@ function initializeUnproductiveWebsites() {
     chrome.storage.sync.set(newTabTimesObject, function () {
 
     });
+}
+
+
+
+// RECORDING FUNCTIONALITY FROM myscript.js
+////////////////////////////////////////////////////////////////////////////////////////////
+
+let interval = null;
+let status = "stopped";
+let seconds = 0;
+let minutes = 0;
+let hours = 0;
+//alert("refreshed");
+
+let displaySeconds = 0;
+let displayMinutes = 0;
+let displayHours = 0;
+
+chrome.runtime.onMessage.addListener(handleMessage);
+
+function handleMessage(message, sender, sendResponse){
+    //alert("received msg from bg");
+    if(message.cmd === 'START_TIME'){
+        startStop();
+    }
+}
+
+
+function recordTime() {
+    seconds ++;
+
+    if(seconds/60 === 1){
+        seconds = 0;
+        minutes++;
+        
+        if(minutes/60 === 1){
+            minutes = 0;
+            hours++;
+        }
+    }
+
+    if (seconds < 10){
+        displaySeconds = "0" +seconds.toString();
+    }
+    else{
+        displaySeconds = seconds;
+    }
+    if (minutes < 10){
+        displayMinutes = "0" +minutes.toString();
+    }
+    else{
+        displayMinutes = minutes;
+    }
+    if (hours < 10){
+        displayHours = "0" +hours.toString();
+    }
+    else{
+        displayHours = hours;
+    }
+
+
+    chrome.runtime.sendMessage({newSeconds: displaySeconds, newMinutes: displayMinutes, newHours: displayHours});
+    chrome.runtime.sendMessage({startStop: "Stop", webManagerVisibility: "hidden"});
+    
+}
+
+
+
+function startStop() {
+
+    if (status === "stopped") {
+        unpause();
+        isRecording = true;
+        interval = window.setInterval(recordTime, 1000);
+        //document.getElementById("startStop").innerHTML = "Stop";
+        //chrome.action.setBadgeText({text: "10"}); // Sets badge (Only works in background.js so disabled until migration)
+        //document.getElementById("webManagerButton").style.visibility =  "hidden";
+        chrome.runtime.sendMessage({startStop: "Stop", webManagerVisibility: "hidden"});
+        status = "started";
+    }
+
+    else {
+        isRecording = false;
+        window.clearInterval(interval);
+        //document.getElementById("startStop").innerHTML = "Start";
+        //chrome.action.setBadgeText({text: "10"}); // Clears badge (Only works in background.js so disabled until migration)
+        //document.getElementById("webManagerButton").style.visibility =  "visible";
+        chrome.runtime.sendMessage({startStop: "Start", webManagerVisibility: "visible"});
+        status = "stopped";
+    
+    }
 }
 
 
