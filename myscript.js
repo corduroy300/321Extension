@@ -1,5 +1,6 @@
 
 document.getElementById("startStop").addEventListener("click", alertBackground);
+document.getElementById("reset"). addEventListener("click", reset)
 
 //When user hits enter on input text field function addToStorage is called
 /*document.getElementById("hostname").addEventListener('keypress', function (e) {
@@ -33,6 +34,13 @@ function updateTime(seconds,minutes,hours){
 function updateButtons(startStop, webManagerVisibility){
     document.getElementById("startStop").innerHTML = startStop;
     document.getElementById("webManagerButton").style.visibility = webManagerVisibility;
+}
+
+function reset (){
+    chrome.runtime.sendMessage({cmd: 'RESET'});
+    document.getElementById("display").innerHTML = "00:00:00";
+    chrome.storage.sync.clear(function() {});
+    alert("reset");
 }
 
 

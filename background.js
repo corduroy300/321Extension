@@ -164,6 +164,10 @@ function handleMessage(message, sender, sendResponse){
     if(message.cmd === 'START_TIME'){
         startStop();
     }
+
+    if(message.cmd == 'RESET'){
+        resetTimes();
+    }
 }
 
 
@@ -226,10 +230,22 @@ function startStop() {
         //document.getElementById("startStop").innerHTML = "Start";
         //chrome.action.setBadgeText({text: "10"}); // Clears badge (Only works in background.js so disabled until migration)
         //document.getElementById("webManagerButton").style.visibility =  "visible";
-        chrome.runtime.sendMessage({startStop: "Start", webManagerVisibility: "visible"});
+        chrome.runtime.sendMessage({startStop: "Start", webManagerVisibility: "hidden"});
         status = "stopped";
     
     }
 }
 
 
+function resetTimes(){
+    seconds = 0; 
+    minutes = 0;
+    hours = 0;
+    displaySeconds = 0;
+    displayHours = 0;
+    displayMinutes = 0;
+    status = 'started';
+    startStop();
+    chrome.runtime.sendMessage({startStop: "Start", webManagerVisibility: "visible"});
+
+}
