@@ -1,7 +1,7 @@
 const unproductiveTabsKey = "unproductiveTabs";
 const lastActiveTabKey = "lastActiveTab";
 var isRecording = false;
-var initialize = false;
+//var initialize = false;
 
 //alert("refreshed");
 /*chrome.tabs.onActivated.addListener(tab =>{
@@ -15,22 +15,30 @@ var initialize = false;
 
 chrome.tabs.onActivated.addListener(function () {
     if (isRecording) {
-        if (!initialize) {
-            initializeUnproductiveWebsites();
-            initialize = true;
-        }
-        tabTrack();
+        chrome.storage.sync.get(unproductiveTabsKey, function(result){
+            let unproductiveTabs = result[unproductiveTabsKey];
+            if(unproductiveTabs != null){
+                tabTrack();
+            }
+            else{
+                console.log("No websites in unproductive list");
+            }
+        });
     }
 });
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tabInfo){
     if(changeInfo.url){
         if (isRecording) {
-            if (!initialize) {
-                initializeUnproductiveWebsites();
-                initialize = true;
-            }
-            tabTrack();
+            chrome.storage.sync.get(unproductiveTabsKey, function(result){
+                let unproductiveTabs = result[unproductiveTabsKey];
+                if(unproductiveTabs != null){
+                    tabTrack();
+                }
+                else{
+                    console.log("No websites in unproductive list");
+                }
+            });
         }
     }
 });
@@ -67,7 +75,10 @@ function tabTrack() {
             if (Object.keys(lastActiveTabJSON).length != 0) {
                 let lastActiveTabURL = lastActiveTabJSON["url"];
                 let numOfPassedSeconds = (Date.now() - lastActiveTabJSON["lastTimeVisited"]) * 0.001; //converts milliseconds to seconds
-
+                if(numOfPassedSeconds >= 300){
+                    //end product needs to be another form of alert
+                    console.log("you spent too much time!");
+                }
 
                 // if the last active tab is an unproductive website, increment the time spent on that site
                 // if not, then ignore the unproductiveTabObject and update the lastActiveTab object in storage
@@ -99,6 +110,19 @@ function tabTrack() {
     });
 }
 
+/*function hasWebsitesStored(){
+    chrome.storage.sync.get(unproductiveTabsKey, function(result){
+        console.log(result[unproductiveTabsKey]);
+        let unproductiveTabs = result[unproductiveTabsKey];
+        if(unproductiveTabs === null){
+            return false;
+        }
+        else{
+            return true;
+        }
+    });
+}*/
+
 function unpause(){
     chrome.storage.sync.get(lastActiveTabKey, function (result){
         let lastActiveTabString = result[lastActiveTabKey];
@@ -116,7 +140,7 @@ function unpause(){
     })
 }
 
-function initializeUnproductiveWebsites() {
+/*function initializeUnproductiveWebsites() {
     //currently sets the list of unproductive websites as youtube and netflix.
     //the tabTrack function will compare the users tabs against this list
     //needs further implementation to incorporate user data
@@ -139,7 +163,7 @@ function initializeUnproductiveWebsites() {
     chrome.storage.sync.set(newTabTimesObject, function () {
 
     });
-}
+}*/
 
 
 
@@ -153,9 +177,9 @@ let minutes = 0;
 let hours = 0;
 //alert("refreshed");
 
-let displaySeconds = 0;
-let displayMinutes = 0;
-let displayHours = 0;
+let displaySeconds = '00';
+let displayMinutes = '00';
+let displayHours = '00';
 
 chrome.runtime.onMessage.addListener(handleMessage);
 
@@ -204,12 +228,18 @@ function recordTime() {
     }
 
 
-    chrome.runtime.sendMessage({newSeconds: displaySeconds, newMinutes: displayMinutes, newHours: displayHours});
-    chrome.runtime.sendMessage({startStop: "Stop", webManagerVisibility: "hidden"});
+    sendTimeInfo();
     
 }
 
+setInterval(sendTimeInfo, 100);
 
+function sendTimeInfo(){
+    chrome.runtime.sendMessage({newSeconds: displaySeconds, newMinutes: displayMinutes, newHours: displayHours});
+    if(status === 'started'){
+        chrome.runtime.sendMessage({startStop: "Stop", webManagerVisibility: "hidden"});
+    }
+}
 
 function startStop() {
 
@@ -230,22 +260,27 @@ function startStop() {
         //document.getElementById("startStop").innerHTML = "Start";
         //chrome.action.setBadgeText({text: "10"}); // Clears badge (Only works in background.js so disabled until migration)
         //document.getElementById("webManagerButton").style.visibility =  "visible";
-        chrome.runtime.sendMessage({startStop: "Start", webManagerVisibility: "hidden"});
+        chrome.runtime.sendMessage({startStop: "Start", webManagerVisibility: "visible"});
         status = "stopped";
     
     }
 }
 
 
+
 function resetTimes(){
     seconds = 0; 
     minutes = 0;
     hours = 0;
-    displaySeconds = 0;
-    displayHours = 0;
-    displayMinutes = 0;
+    displaySeconds = '00';
+    displayHours = '00';
+    displayMinutes = '00';
     status = 'started';
     startStop();
     chrome.runtime.sendMessage({startStop: "Start", webManagerVisibility: "visible"});
 
+}
+
+function timeConversion(seconds){
+    return seconds/60.0; 
 }

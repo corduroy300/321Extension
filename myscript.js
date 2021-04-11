@@ -40,7 +40,7 @@ function reset (){
     chrome.runtime.sendMessage({cmd: 'RESET'});
     document.getElementById("display").innerHTML = "00:00:00";
     chrome.storage.sync.clear(function() {});
-    alert("reset");
+    //alert("reset");
 }
 
 
