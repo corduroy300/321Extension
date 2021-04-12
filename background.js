@@ -10,9 +10,6 @@ var isRecording = false;
     });
 });*/
 //console.log("hello world");
-
-
-
 chrome.tabs.onActivated.addListener(function () {
     if (isRecording) {
         chrome.storage.sync.get(unproductiveTabsKey, function(result){
@@ -44,7 +41,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tabInfo){
 });
 
 function tabTrack() {
-
     //search for the current active tab
     chrome.tabs.query({ 'active': true }, function (tabs) {
 
@@ -140,33 +136,6 @@ function unpause(){
     })
 }
 
-/*function initializeUnproductiveWebsites() {
-    //currently sets the list of unproductive websites as youtube and netflix.
-    //the tabTrack function will compare the users tabs against this list
-    //needs further implementation to incorporate user data
-    unproductiveTabsList = {
-        "www.youtube.com": {
-            url: "www.youtube.com",
-            timeSpent: 0,
-            lastTimeVisited: Date.now()
-        },
-        "www.netflix.com": {
-            url: "www.netflix.com",
-            timeSpent: 0,
-            lastTimeVisited: Date.now()
-        }
-    }
-
-    const tabTimesObjectString = JSON.stringify(unproductiveTabsList);
-    let newTabTimesObject = {};
-    newTabTimesObject[unproductiveTabsKey] = tabTimesObjectString;
-    chrome.storage.sync.set(newTabTimesObject, function () {
-
-    });
-}*/
-
-
-
 // RECORDING FUNCTIONALITY FROM myscript.js
 ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -181,14 +150,20 @@ let displaySeconds = '00';
 let displayMinutes = '00';
 let displayHours = '00';
 
-chrome.runtime.onMessage.addListener(handleMessage);
+chrome.runtime.onMessage.addListener(handleMessage); //Specifies the function for background.js to invoke when a runtime message is received 
 
+/* Used to handle runtime messages
+* There are two messages that need to be handled by background.js 'START_TIME' and 'RESET'
+*/
 function handleMessage(message, sender, sendResponse){
     //alert("received msg from bg");
+
+    //Message sent from myScript.js when the start/stop button is pressed
     if(message.cmd === 'START_TIME'){
         startStop();
     }
 
+    //Message sent from myScript.js when the reset button is pressed
     if(message.cmd == 'RESET'){
         resetTimes();
     }
@@ -226,8 +201,6 @@ function recordTime() {
     else{
         displayHours = hours;
     }
-
-
     sendTimeInfo();
     
 }
@@ -241,33 +214,31 @@ function sendTimeInfo(){
     }
 }
 
+/* Handles backend behavior of what to do when the start/stop button is pushed
+* When the function is called, if the status is "stopped" then it means that the user was pressing the 'Start' button, and hence wants to start execution, vice versa
+*/
 function startStop() {
-
+    //Extension is currently stopped, and user wants to start it
     if (status === "stopped") {
-        unpause();
+        unpause(); //Resume tracking tabs
         isRecording = true;
         interval = window.setInterval(recordTime, 1000);
-        //document.getElementById("startStop").innerHTML = "Stop";
-        //chrome.action.setBadgeText({text: "10"}); // Sets badge (Only works in background.js so disabled until migration)
-        //document.getElementById("webManagerButton").style.visibility =  "hidden";
-        chrome.runtime.sendMessage({startStop: "Stop", webManagerVisibility: "hidden"});
+        chrome.runtime.sendMessage({startStop: "Stop", webManagerVisibility: "hidden"}); //Send message to myScript to update Start button to say 'Stop'
         status = "started";
     }
 
     else {
         isRecording = false;
         window.clearInterval(interval);
-        //document.getElementById("startStop").innerHTML = "Start";
-        //chrome.action.setBadgeText({text: "10"}); // Clears badge (Only works in background.js so disabled until migration)
-        //document.getElementById("webManagerButton").style.visibility =  "visible";
-        chrome.runtime.sendMessage({startStop: "Start", webManagerVisibility: "visible"});
+        chrome.runtime.sendMessage({startStop: "Start", webManagerVisibility: "visible"}); //Send message to myScript to update Start button to say 'Start'
         status = "stopped";
     
     }
 }
 
-
-
+/* Resets all counter back to 00:00:00
+* Resets some crucial values so that the extension stops
+*/
 function resetTimes(){
     seconds = 0; 
     minutes = 0;
@@ -275,8 +246,8 @@ function resetTimes(){
     displaySeconds = '00';
     displayHours = '00';
     displayMinutes = '00';
-    status = 'started';
-    startStop();
+    status = 'started';  //Change status to start because we want to call startStop() and have it stop the extension, (startStop stops the extension if is running)
+    startStop(); //Calling this function will stop the recording, clear interval, change status to stop, and restore the visibility of the add site button
     chrome.runtime.sendMessage({startStop: "Start", webManagerVisibility: "visible"});
 
 }
