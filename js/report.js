@@ -2,16 +2,47 @@
 document.addEventListener(
     "DOMContentLoaded",
     function () {
-        GENERATE_REPORT();
+        populateList();
     },
     false
 );
 
+const unproductiveTabsKey = "unproductiveTabs";
+var unproductiveTabs;
+
 var list = [
-    { "Website": "filler.com", "Time spent": "60 mins" },
-    { "Website": "filler2.com", "Time spent": "10 mins" },
-    { "Website": "filler3.com", "Time spent": "5 mins" },
+    /*{ "Website": "filler.com", "Time spent": "60 mins" },
+    { "Website": "filler2.com", "Time spent": "60 mins" },
+    { "Website": "filler3.com", "Time spent": "60 mins" },*/
 ];
+
+function populateList(){
+    chrome.storage.sync.get(unproductiveTabsKey, function (result) {
+        let listOfUnproductiveTabs = result[unproductiveTabsKey];
+        //alert(listOfUnproductiveTabs);
+
+        if (listOfUnproductiveTabs != null) {
+            unproductiveTabs = JSON.parse(listOfUnproductiveTabs);
+            //alert(unproductiveTabs['www.google.com'].url);
+        } 
+
+        var index = 0;
+        for (const [key, value] of Object.entries(unproductiveTabs)) {
+            
+            var objForList = {};
+            objForList["Website"] = value.url;
+            objForList["Time Spent"] = "" + value.timeSpent;
+
+            list[index] = objForList;
+            index++;
+        }
+
+        //alert(JSON.stringify(list));
+        GENERATE_REPORT();
+
+    });
+
+}//end of populateList
 
 function GENERATE_REPORT() {
     var cols = [];

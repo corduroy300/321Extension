@@ -33,7 +33,7 @@ function addToStorage() {
         "lastTimeVisited": Date.now(),
     };
     //Checks to see if the current list of unproductive tabs is empty 
-    if(unpoductiveTabs == null){
+    if(unproductiveTabs == null){
         unproductiveTabs =  {};
         //The object gets a new property/attribute which is the url of the new site, the value of this attribute is the object holding this sites info
         unproductiveTabs[siteName] = infoOfSite; 
