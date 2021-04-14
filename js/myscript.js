@@ -1,6 +1,11 @@
-
-document.getElementById("startStop").addEventListener("click", alertBackground);
-document.getElementById("reset"). addEventListener("click", reset)
+var startListener = document.getElementById('startStop');
+var resetListener = document.getElementById('reset');
+if (startListener) {
+    startListener.addEventListener("click", alertBackground);
+}
+if (startListener) {
+    resetListener.addEventListener("click", reset);
+}
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
     if(message.newSeconds !== undefined){
@@ -32,6 +37,10 @@ function updateButtons(startStop, webManagerVisibility){
 * myScript.js needs to handle the reset functionality alongside background.js because myScript does not have access to all the code needed by reset
 */
 function reset (){
+    // Opens report.html as a popup
+    chrome.windows.create({
+        'url': '/html/report.html', 'type': 'popup', 'height': 500, 'width': 400
+    });
     chrome.runtime.sendMessage({cmd: 'RESET'});
     document.getElementById("display").innerHTML = "00:00:00";
     chrome.storage.sync.clear(function() {});

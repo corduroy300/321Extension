@@ -1,23 +1,37 @@
-html {
-    height: 300px;
-    width: 250px;
-    font-family: "Spectral";
+@font-face {
+    font-family: "Source Sans Pro";
+    font-style: normal;
+    font-weight: 400;
+    src: local("./fonts/Source Sans Pro.woff2") format("woff2");
+}
+body {
+    font-family: "Source Sans Pro";
 }
 h1 {
     text-align: center;
     font-size: 18px;
 }
-form {
-    text-align: center;
-    position: absolute;
+table {
     width: 100%;
-    top: 25%;
-    left: 0;
+    margin: 0 auto;
+}
+th, td {
+    padding: 15px;
     text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+tr:hover {
+    background-color: #f5f5f5;
+}
+.popup {
+    height: 300px;
+    width: 250px;
 }
 .container {
     text-align: center;
+    margin: 0 auto;
 }
+
 .navbar {
     position: absolute;
     width: 100%;
@@ -27,32 +41,32 @@ form {
 }
 
 .active {
-    background-color: #BEBEBE;
+    background-color: #bebebe;
 }
 .bi {
     font-size: 18px;
-    text-align:center;
+    text-align: center;
 }
-.button{
-    display:inline-block;
-    padding:0.35em 1.2em;
-    border:0.1em solid #FFFFFF;
-    margin:0 0.3em 0.3em 0;
-    border-radius:0.12em;
+.button {
+    display: inline-block;
+    padding: 0.35em 1.2em;
+    border: 0.1em solid #ffffff;
+    margin: 0 0.3em 0.3em 0;
+    border-radius: 0.12em;
     box-sizing: border-box;
-    text-decoration:none;
-    color:#000;
-    text-align:center;
+    text-decoration: none;
+    color: #000;
+    text-align: center;
     transition: all 0.2s;
 }
-.button:hover{
-    color:#FFF;
-    background-color:#000;
+.button:hover {
+    color: #fff;
+    background-color: #000;
 }
-@media all and (max-width:30em) {
+@media all and (max-width: 30em) {
     .button {
         /* display:block; */
-        margin:0.4em auto;
+        margin: 0.4em auto;
     }
 }
 
