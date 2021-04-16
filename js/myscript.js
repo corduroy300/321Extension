@@ -1,10 +1,15 @@
 var startListener = document.getElementById('startStop');
 var resetListener = document.getElementById('reset');
+var reportListner = document.getElementById('reportButton');
+
 if (startListener) {
     startListener.addEventListener("click", alertBackground);
 }
-if (startListener) {
+if (resetListener) {        
     resetListener.addEventListener("click", reset);
+}
+if(reportListner){
+    reportListner.addEventListener("click", viewReport);
 }
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
@@ -38,12 +43,17 @@ function updateButtons(startStop, webManagerVisibility){
 */
 function reset (){
     // Opens report.html as a popup
-    chrome.windows.create({
+    /*chrome.windows.create({
         'url': '/html/report.html', 'type': 'popup', 'height': 500, 'width': 400
-    });
+    });*/
     chrome.runtime.sendMessage({cmd: 'RESET'});
     document.getElementById("display").innerHTML = "00:00:00";
-    //chrome.storage.sync.clear(function() {});
+    chrome.storage.sync.clear(function() {});
     //alert("reset");
 }
 
+function viewReport(){
+    chrome.windows.create({
+        'url': '/html/report.html', 'type': 'popup', 'height': 500, 'width': 400
+    });
+}
