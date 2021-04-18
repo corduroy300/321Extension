@@ -31,7 +31,7 @@ function populateList(){
             
             var objForList = {};
             objForList["Website"] = value.url;
-            objForList["Time Spent"] = "" + value.timeSpent;
+            objForList["Time Spent (minutes)"] = "" + timeConversion(value.timeSpent);
 
             list[index] = objForList;
             index++;
@@ -43,6 +43,10 @@ function populateList(){
     });
 
 }//end of populateList
+
+function timeConversion(seconds){
+    return seconds/60.0; 
+}
 
 function GENERATE_REPORT() {
     var cols = [];
@@ -90,23 +94,43 @@ function GENERATE_REPORT() {
 }
 
 // Chart code
-const labels = ["January", "February", "March", "April", "May", "June"];
-const data = {
+var labels = [];
+var data = {
     labels: labels,
     datasets: [
         {
             label: "Time spent on unproductive websites",
-            backgroundColor: "rgb(255, 99, 132)",
-            borderColor: "rgb(255, 99, 132)",
-            data: [0, 10, 5, 2, 20, 30, 45],
+            backgroundColor: ["#0074D9", "#FF4136", "#2ECC40", "#FF851B", "#7FDBFF", "#B10DC9", "#FFDC00", "#001f3f", "#39CCCC", "#01FF70", "#85144b", "#F012BE", "#3D9970", "#111111", "#AAAAAA"],
+            data: [],
         },
     ],
 };
 
-const config = {
-    type: "line",
+function populateChart(){
+    chrome.storage.sync.get(unproductiveTabsKey, function (result) {
+        let listOfUnproductiveTabs = result[unproductiveTabsKey];
+        //alert(listOfUnproductiveTabs);
+
+        if (listOfUnproductiveTabs != null) {
+            unproductiveTabs = JSON.parse(listOfUnproductiveTabs);
+            //alert(unproductiveTabs['www.google.com'].url);
+        } 
+
+        var index = 0;
+        for (const [key, value] of Object.entries(unproductiveTabs)) {
+            labels[index] = value.url;
+            data.datasets[0].data[index] = timeConversion(value.timeSpent);
+            index++;
+        }
+    });
+}
+
+var config = {
+    type: "pie",
     data,
     options: {},
 };
+
+populateChart();
 
 var myChart = new Chart(document.getElementById("myChart"), config);

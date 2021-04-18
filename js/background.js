@@ -73,7 +73,7 @@ function tabTrack() {
                 let numOfPassedSeconds = (Date.now() - lastActiveTabJSON["lastTimeVisited"]) * 0.001; //converts milliseconds to seconds
                 if(numOfPassedSeconds >= 300){
                     //end product needs to be another form of alert
-                    console.log("you spent too much time!");
+                    alert("You spent too much time on "+lastActiveTabURL+"!");
                 }
 
                 // if the last active tab is an unproductive website, increment the time spent on that site
@@ -252,6 +252,3 @@ function resetTimes(){
 
 }
 
-function timeConversion(seconds){
-    return seconds/60.0; 
-}

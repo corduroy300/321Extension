@@ -37,12 +37,12 @@ function addToStorage() {
         unproductiveTabs =  {};
         //The object gets a new property/attribute which is the url of the new site, the value of this attribute is the object holding this sites info
         unproductiveTabs[siteName] = infoOfSite; 
-        alert("added because list is empty " + unproductiveTabs[siteName].url);
+        alert("Website added to the list: " + unproductiveTabs[siteName].url);
     } else if(typeof unproductiveTabs[siteName] === 'undefined'){
         unproductiveTabs[siteName] = infoOfSite;
-        alert("added because this is new url " + unproductiveTabs[siteName].url);
+        alert("Website added to the list: " + unproductiveTabs[siteName].url);
     } else {
-        alert("site was not added because it is duplicate");
+        alert("This website is already on the list!");
     }
     //After setting the new site name, we need to update this object in chrome storage so that the values are updated across all files
     const tabTimesObjectString = JSON.stringify(unproductiveTabs);//Stringify obj to add to storage
@@ -50,8 +50,6 @@ function addToStorage() {
     newTabTimesObject[unproductiveTabsKey] = tabTimesObjectString;
     //Replaces old unproductive list with the updated one
     chrome.storage.sync.set(newTabTimesObject, function () {
-        chrome.storage.sync.get(unproductiveTabsKey, function (result) {
-            alert("current unproductiveTabsList is: " + result[unproductiveTabsKey])});
     });
 
 }
