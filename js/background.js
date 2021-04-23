@@ -120,17 +120,17 @@ function tabTrack() {
 }*/
 
 function unpause(){
-    chrome.storage.sync.get(lastActiveTabKey, function (result){
+    chrome.storage.sync.get([unproductiveTabsKey, lastActiveTabKey], function (result){
         let lastActiveTabString = result[lastActiveTabKey];
         if(lastActiveTabString != null){
             lastActiveTab = JSON.parse(lastActiveTabString);
             lastActiveTab["lastTimeVisited"] = Date.now();
-
-            lastActiveTabString = JSON.stringify;
+            console.log(lastActiveTab["lastTimeVisited"]);
+            lastActiveTabString = JSON.stringify(lastActiveTab);
             let newActiveTabObject = {};
             newActiveTabObject[lastActiveTabKey] = lastActiveTabString;
             chrome.storage.sync.set(newActiveTabObject, function(){
-
+                console.log("unpaused");
             });
         }
     })
